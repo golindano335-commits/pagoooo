@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reparto de ganancias</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mu:#6b6b66;--bd:#e3e1d9;--ac:#1f6f5c;--ac2:#e8f2ee;--wa:#b4531c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151614;--card:#1f211e;--tx:#ecebe6;--mu:#9a9990;--bd:#33352f;--ac:#4cc3a4;--ac2:#1c2d28;--wa:#f09a62;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151614;--card:#1f211e;--tx:#ecebe6;--mu:#9a9990;--bd:#33352f;--ac:#4cc3a4;--ac2:#1c2d28;--wa:#f09a62;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu)}
+.sub{color:var(--mu);margin:0 0 16px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1 1 140px}
+label{display:block;font-size:13px;color:var(--mu);margin-bottom:4px}
+input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font-size:16px}
+input.big{font-size:24px;font-weight:600}
+button{padding:11px 16px;border-radius:10px;border:0;background:var(--ac);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:9px 6px;border-bottom:1px solid var(--bd);text-align:left}th{font-size:12px;color:var(--mu);text-transform:uppercase}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.hl td{font-weight:700}tr.last td{border-bottom:0}
+.wrap{overflow-x:auto}
+.bar{height:16px;background:var(--ac2);border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.bar>i{display:block;height:100%;background:var(--ac);width:0;transition:width .4s}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.k{background:var(--ac2);border-radius:12px;padding:12px}.k b{display:block;font-size:20px}.k span{font-size:12px;color:var(--mu)}
+.cap{color:var(--wa);font-size:13px;margin-top:8px}
+summary{cursor:pointer;font-weight:600}
+.x{background:none;color:#c0392b;border:1px solid var(--bd);padding:4px 10px;font-size:13px;font-weight:500}.x:hover{background:#c0392b;color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chips button{background:var(--ac2);color:var(--ac);padding:7px 12px;font-size:14px}
+.seg{display:flex;height:34px;border-radius:10px;overflow:hidden;margin-top:14px;background:var(--ac2)}.seg div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;transition:flex-grow .4s;overflow:hidden;white-space:nowrap;cursor:pointer}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mu);margin-top:6px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:#222;color:#fff;padding:11px 16px;border-radius:12px;display:flex;gap:14px;align-items:center;transition:transform .3s;z-index:9;font-size:14px;max-width:92vw}#toast.on{transform:translate(-50%,0)}#toast button{background:none;color:#7fe0c3;padding:0}
+input[type=range]{padding:0;margin-top:6px;accent-color:var(--ac);border:0;background:none}
+.pop{animation:pop .35s}@keyframes pop{50%{transform:scale(1.03)}}
+</style></head><body><main>
+<h1>Reparto de ganancias</h1>
+<p class="sub">Anota la ganancia de cada venta y se reparte sola: reserva, inversora, deuda y socios.</p>
+
+<div class="card">
+<h2>Nueva venta</h2>
+<div class="row">
+<div style="flex:2 1 200px"><label>Ganancia / margen (USD)</label><input id="amt" class="big" type="number" inputmode="decimal" min="0" step="0.01" placeholder="600"></div>
+<div style="flex:2 1 200px"><label>Nota (opcional)</label><input id="note" placeholder="Ej. pedido de camisetas"></div>
+</div>
+<div class="chips"><button data-v="50">+50</button><button data-v="100">+100</button><button data-v="250">+250</button><button data-v="500">+500</button><button data-v="0" style="background:transparent;color:var(--mu)">Limpiar</button></div>
+<div class="seg" id="seg"></div><div class="leg" id="leg"></div>
+<div class="wrap" style="margin-top:12px"><table id="prev"></table></div>
+<div id="warn" class="cap"></div>
+<div class="row" style="margin-top:12px"><button id="add">Registrar venta</button></div>
+</div>
+
+<div class="card">
+<h2>Deuda pendiente</h2>
+<div class="bar"><i id="pb"></i></div>
+<div class="grid" id="dk"></div>
+</div>
+
+<div class="card">
+<h2>Acumulado</h2>
+<div class="grid" id="tot"></div>
+</div>
+
+<div class="card">
+<h2>Historial</h2>
+<div class="wrap"><table id="hist"></table></div>
+<div class="row" style="margin-top:12px"><button class="g" id="clr">Borrar todas las ventas</button></div>
+</div>
+
+<details class="card" id="cfg">
+<summary>Configuración</summary>
+<div class="row" style="margin-top:12px">
+<div><label>Reserva y reinversión (%)</label><input id="pRes" type="number" step="any"></div>
+<div><label>Inversora (% de utilidad neta)</label><input id="pInv" type="number" step="any"></div>
+<div><label>Pago de deuda (% del restante para socios)</label><input id="pDeb" type="number" step="any"></div>
+<div><label>Deuda total (USD)</label><input id="debt" type="number" step="any"></div>
+</div>
+<div class="row" style="margin-top:10px">
+<div><label>Socio A</label><input id="nA"></div>
+<div><label>% Socio A (el resto va al Socio B)</label><input id="pA" type="number" step="any"></div>
+<div><label>Socio B</label><input id="nB"></div>
+<div><label>Nombre inversora</label><input id="nI"></div>
+</div>
+<p class="sub" style="margin-top:10px">Orden: reserva → inversora (sobre lo que queda) → deuda (sobre lo que queda) → socios. Los cambios aplican a ventas nuevas. El pago de deuda se detiene al llegar a cero.</p>
+<div class="row"><button class="g" id="rst">Borrar todo el historial</button></div>
+</details>
+</main><div id="toast"><span id="tm"></span><button id="tu">Deshacer</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const D={pRes:20,pInv:10,pDeb:25,debt:1025.75,nA:"Yo",nB:"Mi esposa",nI:"Inversora",pA:50};
+let S=Object.assign({},D),H=[];
+try{const s=JSON.parse(localStorage.getItem("rep_s")||"null");if(s)S=Object.assign({},D,s.S);H=(s&&s.H)||[]}catch(e){}
+const save=()=>{try{localStorage.setItem("rep_s",JSON.stringify({S,H}))}catch(e){}};
+const f=n=>"$"+(Math.round(n*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const r2=n=>Math.round(n*100)/100;
+const paid=()=>H.reduce((a,h)=>a+h.deb,0);
+const left=()=>Math.max(0,S.debt-paid());
+function calc(m){
+ const res=r2(m*S.pRes/100),net=r2(m-res),inv=r2(net*S.pInv/100),rest=r2(net-inv);
+ const deb=r2(Math.min(rest*S.pDeb/100,left())),soc=r2(rest-deb);
+ const a=r2(soc*S.pA/100),b=r2(soc-a);
+ return{m,res,net,inv,rest,deb,soc,a,b};
+}
+function prev(){
+ const m=parseFloat($("amt").value)||0,c=calc(m);
+ const R=(t,v,cl)=>`<tr class="${cl||""}"><td>${t}</td><td class="n">${f(v)}</td></tr>`;
+ $("prev").innerHTML=R("Ganancia total",c.m,"hl")+R(`Reserva y reinversión (${S.pRes}%)`,c.res)+R("Utilidad neta distribuible",c.net)+
+ R(`${S.nI} (${S.pInv}% de la neta)`,c.inv)+R("Restante",c.rest)+R("Pago de deuda",c.deb)+R("Para socios",c.soc)+
+ R(S.nA+` (${S.pA}%)`,c.a,"hl")+R(S.nB+` (${100-S.pA}%)`,c.b,"hl last");
+ $("warn").textContent=(S.pDeb>0&&left()===0)?"La deuda ya está pagada: ese porcentaje pasa a los socios.":"";
+}
+function render(){
+ const p=paid(),pc=S.debt>0?Math.min(100,p/S.debt*100):100;
+ $("pb").style.width=pc+"%";
+ $("dk").innerHTML=`<div class="k"><b>${f(p)}</b><span>Pagado</span></div><div class="k"><b>${f(left())}</b><span>Falta pagar</span></div><div class="k"><b>${pc.toFixed(1)}%</b><span>de ${f(S.debt)}</span></div>`;
+ const t=k=>H.reduce((a,h)=>a+h[k],0);
+ const K=(l,v)=>`<div class="k"><b>${f(v)}</b><span>${l}</span></div>`;
+ $("tot").innerHTML=K("Ganancias",t("m"))+K("Reserva / reinversión",t("res"))+K(S.nI,t("inv"))+K("A deuda",t("deb"))+K(S.nA,t("a"))+K(S.nB,t("b"));
+ $("hist").innerHTML=H.length?`<tr><th>Fecha</th><th class="n">Ganancia</th><th class="n">Reserva</th><th class="n">Inv.</th><th class="n">Deuda</th><th class="n">A</th><th class="n">B</th><th></th></tr>`+
+ H.slice().reverse().map(h=>{const i=H.indexOf(h);return `<tr><td>${h.d}${h.n?"<br><small style='color:var(--mu)'>"+esc(h.n)+"</small>":""}</td><td class="n">${f(h.m)}</td><td class="n">${f(h.res)}</td><td class="n">${f(h.inv)}</td><td class="n">${f(h.deb)}</td><td class="n">${f(h.a)}</td><td class="n">${f(h.b)}</td><td><button class="x" data-i="${i}">Eliminar</button></td></tr>`}).join(""):"<tr><td style='color:var(--mu)'>Aún no hay ventas registradas.</td></tr>";
+ prev();
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let tT,undo=null;
+function toast(m,u){$("tm").textContent=m;undo=u||null;$("tu").style.display=u?"":"none";$("toast").classList.add("on");clearTimeout(tT);tT=setTimeout(()=>$("toast").classList.remove("on"),5000)}
+$("tu").onclick=()=>{if(undo)undo();undo=null;$("toast").classList.remove("on")};
+const _p=prev,COL=["#1f6f5c","#8e6bbf","#c0392b","#2b7bb9","#d98a1c"];
+prev=function(){_p();const c=calc(parseFloat($("amt").value)||0),L=[["Reserva",c.res],[S.nI,c.inv],["Deuda",c.deb],[S.nA,c.a],[S.nB,c.b]];
+$("seg").innerHTML=L.map((x,i)=>`<div style="flex:${c.m>0?x[1]:0} 1 0;background:${COL[i]}" title="${esc(x[0])}: ${f(x[1])}" onclick="toast('${esc(x[0]).replace(/'/g,'')}: ${f(x[1])}')">${c.m>0&&x[1]/c.m>.12?esc(x[0]):""}</div>`).join("");
+$("leg").innerHTML=L.map((x,i)=>`<span><i style="background:${COL[i]}"></i>${esc(x[0])}</span>`).join("")};
+document.querySelector(".chips").onclick=e=>{const v=e.target.dataset&&e.target.dataset.v;if(v==null)return;$("amt").value=v=="0"?"":(parseFloat($("amt").value)||0)+(+v);prev()};
+$("amt").onkeydown=$("note").onkeydown=e=>{if(e.key=="Enter")$("add").click()};
+$("amt").oninput=prev;
+$("add").onclick=()=>{const m=parseFloat($("amt").value);if(!(m>0)){$("amt").focus();return}
+ const c=calc(m);c.d=new Date().toLocaleDateString("es");c.n=$("note").value.trim();const was=left();H.push(c);save();$("amt").value="";$("note").value="";render();
+ toast(was>0&&left()===0?"¡Deuda pagada por completo! 🎉":"Venta registrada: "+f(m),()=>{H.pop();save();render()});
+ ["dk","tot"].forEach(k=>{$(k).classList.remove("pop");void $(k).offsetWidth;$(k).classList.add("pop")})};
+$("hist").onclick=e=>{const i=e.target.dataset&&e.target.dataset.i;if(i==null)return;const h=H.splice(+i,1)[0];save();render();toast("Venta eliminada",()=>{H.splice(+i,0,h);save();render()})};
+function wipe(b){if(!H.length){toast("No hay ventas que borrar");return}
+ if(b.dataset.arm){const old=H;H=[];save();render();toast("Historial borrado",()=>{H=old;save();render()});b.dataset.arm="";b.textContent=b.dataset.t;return}
+ b.dataset.arm=1;b.dataset.t=b.textContent;b.textContent="¿Seguro? Toca otra vez";setTimeout(()=>{b.dataset.arm="";b.textContent=b.dataset.t},3500)}
+$("rst").onclick=()=>wipe($("rst"));$("clr").onclick=()=>wipe($("clr"));
+const nums=["pRes","pInv","pDeb","debt","pA"],txt=["nA","nB","nI"];
+function load(){nums.concat(txt).forEach(k=>$(k).value=S[k]);
+ ["pRes","pInv","pDeb","pA"].forEach(k=>{const r=document.createElement("input");r.type="range";r.min=0;r.max=100;r.step=1;r.value=S[k];$(k).after(r);r.oninput=()=>{$(k).value=r.value;$(k).dispatchEvent(new Event("input"))};$(k).addEventListener("input",()=>r.value=$(k).value)})}
+nums.forEach(k=>$(k).oninput=()=>{const v=parseFloat($(k).value);S[k]=isNaN(v)?0:v;save();render()});
+txt.forEach(k=>$(k).oninput=()=>{S[k]=$(k).value||D[k];save();render()});
+load();render();
+</script></body></html>
